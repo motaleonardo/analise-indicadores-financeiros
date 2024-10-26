@@ -22,3 +22,45 @@ def instance_cursor():
             cursor.close()
             connection.close()
             print('Conexão com o Banco de Dados fechada')
+
+def consulta_geral():
+    with instance_cursor() as cursor:
+        query = '''
+            SELECT *
+            FROM USUARIOS
+        '''
+        cursor.execute(query, )
+        request = cursor.fetchall()
+        return request
+    
+def consulta_nome(user):
+    with instance_cursor() as cursor:
+        query = '''
+            SELECT name, user, password
+            FROM USUARIOS
+            WHERE user = %s
+        '''
+        cursor.execute(query, (user, ))
+        request = cursor.fetchall()
+        return request
+    
+def create_table():
+    connection = psycopg2.connect(database=database, host=host, user=username, password=password, port=port)
+    cursor = connection.cursor()
+
+    query = '''
+        CREATE TABLE IF NOT EXISTS USUARIOS (
+            id serial PRIMARY KEY,
+            name varchar(255),
+            user varchar(255),
+            password varchar(255)
+        )
+        '''
+    
+    cursor.execute(query, )
+    connection.commit()
+    print('Tabela criada com sucesso')
+    if (connection):
+        cursor.close()
+        connection.close()
+        print('Conexão com o Banco de Dados fechada')

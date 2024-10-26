@@ -1,22 +1,26 @@
 import streamlit as st
-from streamlit_authenticator import stauth
+import streamlit_authenticator as stauth
+from dependencies import consulta_nome, consulta_geral
 
 COOKIE_EXPIRE_DAYS = 30
 
 def main():
-    authenticator = stauth.Authenticator(
-        {'username': {'teste':{'name': 'testando', 'password': 'blabla'}}},
+    authenticator = stauth.Authenticate(
+        {'usernames': {'teste':{'name': 'testando', 'password': 'blabla'}}},
         'random_coockie_name',
         'random_signature_key',
 
         COOKIE_EXPIRE_DAYS,
     )
 
-    if 'onClick' not in st.session_state:
+    if 'onClickLogin' not in st.session_state:
         st.session_state['onClickLogin'] = False
     
     if st.session_state['onClickLogin'] == False:
         login_form(authenticator)
+    else:
+        user_form()
+
 
 def login_form(authenticator):
     name, authentication_status, username = authenticator.login('Login')
@@ -28,7 +32,7 @@ def login_form(authenticator):
         st.write('Usuário ou senha inválidos, caso não tenha cadastro, entre em contato com o administrador')
     elif authentication_status == None:
         st.warning('Olá, faça seu login para acessar o dashboard')
-        onClickLogin = st.button('Login')
+        onClickLogin = st.button('Registrar')
         if onClickLogin:
             st.session_state['onClickLogin'] = True
             st.rerun()
@@ -37,8 +41,10 @@ def confirm_msg():
     hashed_password = stauth.Hasher([st.session_state.password]).generate()
     if st.session_state.password != st.session_state.confirm_password:
         st.warning('Senhas não conferem')
-    elif 'consult_username':
+    elif consulta_nome():
         st.warning('Nome do usuário já existe')
+    else:
+        'add_registro()'
         st.success('Registro Efetuado!')
 
 def user_form():
@@ -48,13 +54,14 @@ def user_form():
         password = st.text_input('Senha', type='password', key='password')
         confirm_password = st.text_input('Confirme a senha', type='password', key='confirm_password')
         submit_button = st.form_submit_button(
-            'Salvar', on_click=confirm_msg,
+            "Salvar", on_click=confirm_msg,
         )
-        onClickForm = st.button('Fazer Login')
-        if onClickForm:
-            st.session_state['onClickLogin'] = False
-            st.rerun()
+    onClickForm = st.button('Fazer Login')
+    if onClickForm:
+        st.session_state['onClickLogin'] = False
+        st.rerun()
 
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
