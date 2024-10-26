@@ -53,7 +53,12 @@ def create_table():
             id serial PRIMARY KEY,
             name varchar(255),
             user varchar(255),
-            password varchar(255)
+            password varchar(255),
+            admin boolean,
+            created_at timestamp,
+            updated_at timestamp,
+            deleted_at timestamp,
+            active boolean
         )
         '''
     
@@ -64,3 +69,14 @@ def create_table():
         cursor.close()
         connection.close()
         print('Conexão com o Banco de Dados fechada')
+
+
+def add_registro(name, user, passw, created_at):
+    connection = psycopg2.connect(database=database, host=host, user=username, password=password, port=port)
+    cursor = connection.cursor()
+
+    query = '''
+        INSERT INTO USUARIOS
+        {name, user, passw, created_at}
+        VALUES (%s, %s, %s, %s)
+    '''
