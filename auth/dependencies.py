@@ -29,18 +29,18 @@ def consulta_geral():
             SELECT *
             FROM USUARIOS
         '''
-        cursor.execute(query, )
+        cursor.execute(query)
         request = cursor.fetchall()
         return request
     
 def consulta_nome(user):
     with instance_cursor() as cursor:
         query = '''
-            SELECT name, user, password
+            SELECT name, username, password
             FROM USUARIOS
-            WHERE user = %s
+            WHERE username = %s
         '''
-        cursor.execute(query, (user, ))
+        cursor.execute(query, (user,))
         request = cursor.fetchall()
         return request
     
@@ -52,37 +52,33 @@ def create_table():
         CREATE TABLE IF NOT EXISTS USUARIOS (
             id serial PRIMARY KEY,
             name varchar(255),
-            user varchar(255),
+            username varchar(255),
             password varchar(255),
-            admin boolean,
+            email varchar(255),
             created_at timestamp,
-            updated_at timestamp,
-            deleted_at timestamp,
-            active boolean
+            admin boolean DEFAULT FALSE,
+            UNIQUE (username)
         )
-        '''
-    
-    cursor.execute(query, )
+    '''
+    cursor.execute(query)
     connection.commit()
-    print('Tabela criada com sucesso')
-    if (connection):
-        cursor.close()
-        connection.close()
-        print('Conexão com o Banco de Dados fechada')
+    cursor.close()
+    connection.close()
+    print('Tabela USUARIOS criada com sucesso')
 
 
-def add_registro(name, user, passw, created_at):
+def add_registro(name, user, passw, email, created_at):
     connection = psycopg2.connect(database=database, host=host, user=username, password=password, port=port)
     cursor = connection.cursor()
 
-    query = f'''
-        INSERT INTO USUARIOS
-        {name, user, passw, created_at}
+    query = '''
+        INSERT INTO USUARIOS (name, username, password, email, created_at)
+        VALUES (%s, %s, %s, %s, %s)
     '''
 
-    cursor.execute(query, )
+    cursor.execute(query, (name, user, passw, email, created_at))
     connection.commit()
-    if (connection):
+    if connection:
         cursor.close()
         connection.close()
         print('Conexão com o Banco de Dados fechada')
