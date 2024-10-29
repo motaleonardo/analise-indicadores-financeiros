@@ -1,15 +1,29 @@
 import streamlit as st
 import streamlit_authenticator as stauth
-from dependencies import consulta_nome, consulta_geral
+from dependencies import consulta_nome, consulta_geral, add_registro, create_table
 
 COOKIE_EXPIRE_DAYS = 30
 
 def main():
+
+    try:
+        consulta_geral()
+    except:
+        create_table()
+
+    db_query = consulta_geral()
+
+    registros = { 'usernames' : {} }
+    for data in db_query:
+        registros['usernames'][data[1]] = {
+            'name': data[0],
+            'password': data[2]
+        }
+    
     authenticator = stauth.Authenticate(
-        {'usernames': {'teste':{'name': 'testando', 'password': 'blabla'}}},
+        registros,
         'random_coockie_name',
         'random_signature_key',
-
         COOKIE_EXPIRE_DAYS,
     )
 
@@ -44,7 +58,7 @@ def confirm_msg():
     elif consulta_nome():
         st.warning('Nome do usuário já existe')
     else:
-        'add_registro()'
+        add_registro()
         st.success('Registro Efetuado!')
 
 def user_form():

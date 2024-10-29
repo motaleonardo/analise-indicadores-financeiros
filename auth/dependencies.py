@@ -75,8 +75,14 @@ def add_registro(name, user, passw, created_at):
     connection = psycopg2.connect(database=database, host=host, user=username, password=password, port=port)
     cursor = connection.cursor()
 
-    query = '''
+    query = f'''
         INSERT INTO USUARIOS
         {name, user, passw, created_at}
-        VALUES (%s, %s, %s, %s)
     '''
+
+    cursor.execute(query, )
+    connection.commit()
+    if (connection):
+        cursor.close()
+        connection.close()
+        print('Conexão com o Banco de Dados fechada')
